@@ -24,7 +24,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     label = tk.Label(root, text="Ожидание результата...")
     label.pack()
-
+    print('lol')
     at.start(main())
     root.mainloop()
 
