@@ -5,7 +5,7 @@ import time
 language = 'ru'
 model_id = 'v3_1_ru'
 sample_rate = 48000  # 48000
-speaker = 'baya'  # aidar, baya, kseniya, xenia, random
+speaker = 'xenia'  # aidar(мужик), baya(kaif), kseniya(milf), xenia(так по старше но не милф), random
 put_accent = True
 put_yo = True
 device = torch.device('cpu')  # cpu или gpu
@@ -17,7 +17,6 @@ model, _ = torch.hub.load(repo_or_dir='snakers4/silero-models',
 model.to(device)
 
 
-# воспроизводим
 def va_speak(what: str):
     audio = model.apply_tts(text=what+"..",
                             speaker=speaker,
