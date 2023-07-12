@@ -1,13 +1,13 @@
 # C ТРЕЕМ
-from  speak import *
-from voice import va_speak
 import sys
 import threading
 import pystray
+
+from  speak import *
+from voice import va_speak
 from pystray import MenuItem as item
 from PIL import Image
-
-
+from function import *
 
 def listen():
     while True:
@@ -21,7 +21,6 @@ def start_listening():
     thread = threading.Thread(target=listen)
     thread.daemon = True
     thread.start()
-
 
 def on_startup(text: str):
     # сделай здесь обработку текста тоесть 1 слова это галя или нет и удали это слово
