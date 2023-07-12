@@ -24,6 +24,7 @@ def start_listening():
 
 
 def on_startup(text: str):
+    # сделай здесь обработку текста тоесть 1 слова это галя или нет
     va_speak(text)
 
 def on_exit():
@@ -32,9 +33,7 @@ def on_exit():
     sys.exit(0)
 
 
-menu = (
-    item('Выход', on_exit),
-)
+menu = (item('Выход', on_exit),)
 
 
 if __name__ == "__main__":
