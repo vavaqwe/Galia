@@ -29,12 +29,12 @@ def on_startup(text: str):
     first_word = words[0]
     for i in config.act:
         if first_word == i:
-            text = text.strip(i)  # Присваиваем новую строку с удаленными символами переменной text
-            print(text)
-            news(text)
-            off(text)
-            ua(text)
-            time_now(text)
+            remaining_words = text[4:]  # Присваиваем новую строку с удаленными символами переменной text
+            print(remaining_words)
+            news(remaining_words)
+            off(remaining_words)
+            ua(remaining_words)
+            time_now(remaining_words)
 
 def on_exit():
     print("Приложение завершено")
