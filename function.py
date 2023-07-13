@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from num2words import num2words
 import config
 # import main
-# import speak
+import speak
 import voice
 
 
@@ -68,3 +68,7 @@ def time_now(text):
             text = "Сейч+ас " + num2words(now.hour, lang='ru') + " " + num2words(now.minute, lang='ru')
             voice.va_speak(text)
             print(text)
+
+def game(text):
+    for text1 in speak.listen():
+        print(text1)
