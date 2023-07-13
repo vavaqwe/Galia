@@ -8,6 +8,7 @@ from voice import va_speak
 from pystray import MenuItem as item
 from PIL import Image
 from function import *
+import config
 
 def listen():
     while True:
@@ -23,12 +24,14 @@ def start_listening():
     thread.start()
 
 def on_startup(text: str):
-    if "Галя" in text:
-        print("ok")
-    else:
-        print("not ok")# сделай здесь обработку текста тоесть 1 слова это галя или нет и удали это слово
-    # и нам ещё нужно сделать конфиг ток хочу либо джсон файл или создать файл
-    va_speak(text)
+    print(text)
+    words = text.split()  # Разделяем строку на слова
+    first_word = words[0]
+    for i in config.act:
+        if first_word == i:
+            text = text.strip(i)  # Присваиваем новую строку с удаленными символами переменной text
+            print(text)
+            news(text)
 
 def on_exit():
     print("Приложение завершено")
