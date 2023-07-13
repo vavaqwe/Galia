@@ -32,6 +32,9 @@ def on_startup(text: str):
             text = text.strip(i)  # Присваиваем новую строку с удаленными символами переменной text
             print(text)
             news(text)
+            off(text)
+            ua(text)
+            time_now(text)
 
 def on_exit():
     print("Приложение завершено")
