@@ -1,14 +1,15 @@
 # C ТРЕЕМ
-import sys
+# import sys
 import threading
 import pystray
+import tkinter as tk
 
 from  speak import *
-from voice import va_speak
-from pystray import MenuItem as item
+# from voice import va_speak
 from PIL import Image
 from function import *
 import config
+from tkinter import simpledialog
 
 def listen():
     while True:
@@ -25,16 +26,17 @@ def start_listening():
 
 def on_startup(text: str):
     print(text)
-    words = text.split()  # Разделяем строку на слова
+    words = text.split()
     first_word = words[0]
     for i in config.act:
         if first_word == i:
-            remaining_words = text[4:]  # Присваиваем новую строку с удаленными символами переменной text
-            print(remaining_words)
-            news(remaining_words)
-            off(remaining_words)
-            ua(remaining_words)
-            time_now(remaining_words)
+            new_string = ' '.join(words[1:])
+            news(new_string)
+            off(new_string)
+            ua(new_string)
+            time_now(new_string)
+            check_weather_commands(text)
+            exit(new_string)
 
 def on_exit():
     print("Приложение завершено")
@@ -42,7 +44,24 @@ def on_exit():
     sys.exit(0)
 
 
-menu = (item('Выход', on_exit),)
+def show_input_dialog():
+    root = tk.Tk()
+    root.withdraw()  # Скрыть основное окно tkinter
+
+    # Отобразить диалоговое окно с вводом текста
+    user_input = simpledialog.askstring("Input", "Введите город ")
+
+    # Обработка введенного текста
+    if user_input:
+        print("Введенный текст:", user_input)
+    return user_input
+
+
+menu = (
+    pystray.MenuItem('Input Text', show_input_dialog),
+    pystray.MenuItem('Выход', on_exit)
+)
+
 
 
 if __name__ == "__main__":

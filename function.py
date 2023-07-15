@@ -2,16 +2,16 @@ import datetime
 import os
 import sys
 # import time
-# import webbrowser
+import webbrowser
 #
-# import pyautogui as pg
-# import pyowm
+import pyautogui as pg
+import pyowm
 import requests
 from bs4 import BeautifulSoup
 
 from num2words import num2words
 import config
-# import main
+import main
 import speak
 import voice
 
@@ -42,7 +42,7 @@ def news(text):
                 voice.va_speak(rw)
 
 def off(text):
-    if ' выход' in text.lower() or ' выключись' in text.lower():
+    if 'выход' in text.lower() or 'выключись' in text.lower():
         voice.va_speak("Выключаюсь")
         sys.exit(1)
 
@@ -63,7 +63,7 @@ def ua(text):
 
 def time_now(text):
     for i in config.list_time:
-        if i == text:
+        if i in text:
             now = datetime.datetime.now()
             text = "Сейч+ас " + num2words(now.hour, lang='ru') + " " + num2words(now.minute, lang='ru')
             voice.va_speak(text)
@@ -72,3 +72,49 @@ def time_now(text):
 def game(text):
     for text1 in speak.listen():
         print(text1)
+
+def weather_with_city(text):
+    words = text.split()
+    last_word = words[-1]
+    try:
+        if last_word:
+            observation = config.mgr.weather_at_place(last_word.strip())
+            w = observation.weather_with_сity
+            temp = w.temperature('celsius')["temp"]
+            voice.va_speak('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
+            print('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
+    except pyowm.commons.exceptions.NotFoundError:
+        voice.va_speak("Извините я не поняла, скажите ещё раз")
+
+def check_weather_commands(text):
+    for command in config.list_weather:
+        if command in text:
+            if "погода" in text and 'погоду' in text:
+                weather()
+            if "в городе" in text:
+                weather_with_city(text)
+
+def weather():
+    try:
+        city = main.show_input_dialog()
+        observation = config.mgr.weather_at_place(city)
+        w = observation.weather
+        temp = w.temperature('celsius')["temp"]
+        voice.va_speak('Температура ' + 'в ' + city + '  ' + num2words(temp, lang='ru') + ' градусов')
+        print('Температура ' + 'в ' + city + '  ' + num2words(temp, lang='ru') + ' градусов')
+    except pyowm.commons.exceptions.NotFoundError:
+        voice.va_speak("Извините я не поняла, скажите ещё раз")
+
+def internet(text):
+    for i in config.list_search:
+        if i in text:
+            b = text.strip(str(i))
+            webbrowser.open_new_tab('https://www.google.com/search?q=' + b)
+
+    if "нажми" in text.lower() or "нажать" in text.lower():
+        pg.click()
+
+    for i in config.list_browser:
+        if i in text:
+            voice.va_speak("Включаю браузер")
+            webbrowser.open_new_tab('https://www.google.com')
