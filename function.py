@@ -114,6 +114,10 @@ def internet(text):
     if "нажми" in text.lower() or "нажать" in text.lower():
         pg.click()
 
+    if 'найди' in text.lower or "найди" in text.lower():
+        b = text.strip(str(text))
+        webbrowser.open_new_tab('https://www.google.com/search?q=' + b)
+
     for i in config.list_browser:
         if i in text:
             voice.va_speak("Включаю браузер")
