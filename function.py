@@ -3,7 +3,8 @@ import os
 import sys
 # import time
 import webbrowser
-#
+from pywhatkit import search
+
 import pyautogui as pg
 import pyowm
 import requests
@@ -76,6 +77,8 @@ def game(text):
 def weather_with_city(text):
     words = text.split()
     last_word = words[-1]
+    if last_word == "стоп" or last_word == "нужно":
+        return
     try:
         if last_word:
             observation = config.mgr.weather_at_place(last_word.strip())
@@ -84,12 +87,13 @@ def weather_with_city(text):
             voice.va_speak('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
             print('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
     except pyowm.commons.exceptions.NotFoundError:
-        voice.va_speak("Извините я не поняла, скажите ещё раз")
+        voice.va_speak("Извините я не поняла, скажите ещё раз город в котором вы хотите узнать погоду")
+        weather_with_city(speak.listen())
 
 def check_weather_commands(text):
     for command in config.list_weather:
         if command in text:
-            if "погода" in text and 'погоду' in text:
+            if 'погода' in text and 'погоду' in text:
                 weather()
             if "в городе" in text:
                 weather_with_city(text)
@@ -103,7 +107,8 @@ def weather():
         voice.va_speak('Температура ' + 'в ' + city + '  ' + num2words(temp, lang='ru') + ' градусов')
         print('Температура ' + 'в ' + city + '  ' + num2words(temp, lang='ru') + ' градусов')
     except pyowm.commons.exceptions.NotFoundError:
-        voice.va_speak("Извините я не поняла, скажите ещё раз")
+        voice.va_speak("Извините я не поняла, напишите ещё раз")
+        weather()
 
 def internet(text):
     for i in config.list_search:
@@ -111,12 +116,11 @@ def internet(text):
             b = text.strip(str(i))
             webbrowser.open_new_tab('https://www.google.com/search?q=' + b)
 
-    if "нажми" in text.lower() or "нажать" in text.lower():
+    if 'нажми' in text.lower() or 'нажать' in text.lower():
         pg.click()
 
-    if 'найди' in text.lower or "найди" in text.lower():
-        b = text.strip(str(text))
-        webbrowser.open_new_tab('https://www.google.com/search?q=' + b)
+    if 'поищи' in text.lower or 'найди' in text.lower():
+        search(str(text))
 
     for i in config.list_browser:
         if i in text:
