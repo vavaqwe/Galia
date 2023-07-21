@@ -5,6 +5,7 @@ import sys
 import webbrowser
 from pywhatkit import search
 
+from pytube import YouTube, Search
 import pyautogui as pg
 import pyowm
 import requests
@@ -126,3 +127,24 @@ def internet(text):
         if i in text:
             voice.va_speak("Включаю браузер")
             webbrowser.open_new_tab('https://www.google.com')
+
+def write(text):
+    for i in config.list_write:
+        if i in text:
+            text
+
+
+def play_track(text):
+    url = track_queue[0]
+    try:
+        video = YouTube(url)
+        audio_stream = video.streams.filter(only_audio=True, mime_type="audio/mp4").first()
+        if audio_stream:
+            voice_clients[guild_id].play(discord.FFmpegPCMAudio(source=audio_stream.url, executable=ffmpeg_path, **FFMPeG_CONf), after=lambda e: asyncio.run_coroutine_threadsafe(play_next_track(guild_id), client.loop))
+    except Exception as err:
+        print(f"Error playing audio: {err}")
+        await voice_clients[guild_id].disconnect()
+        del voice_clients[guild_id]
+        track_queue.pop(0)
+        if len(track_queue) > 0:
+            await play_track(guild_id)
