@@ -31,11 +31,13 @@ def on_startup(text: str):
     for i in config.act:
         if first_word == i:
             new_string = ' '.join(words[1:])
+            print(new_string)
             news(new_string)
             off(new_string)
             ua(new_string)
             time_now(new_string)
-            check_weather_commands(text)
+            check_weather_commands(new_string)
+            check_sound_commands(new_string)
             exit(new_string)
 
 def on_exit():

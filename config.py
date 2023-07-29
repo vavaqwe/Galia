@@ -15,7 +15,11 @@ list_weather = ["погода", "погоду","какая сейчас пого
 
 list_write = ['музыку']
 
+list_sound = ['сделай звук ','выключи звук','сделать звук']
+
 owm = OWM('69be55df671a26b648a0b198c0739f9e')
 config_dict = get_default_config()
 config_dict['language'] = 'ru'
 mgr = owm.weather_manager()
+
+ffmpeg_path = r'bin\ffmpeg.exe'
