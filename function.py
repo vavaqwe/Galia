@@ -51,10 +51,6 @@ def news(text):
                 voice.va_speak(rw)
 
 def off(text):
-    if 'выход' in text.lower() or 'выключись' in text.lower():
-        voice.va_speak("Выключаюсь")
-        sys.exit(1)
-
     if ' выключи компьютер' in text:
         voice.va_speak("Выключаю подождите")
         os.system("shutdown -s")
