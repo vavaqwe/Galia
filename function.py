@@ -1,12 +1,18 @@
 import datetime
 import os
 import sys
-# import time
 import webbrowser
-from pywhatkit import search
 
-from pytube import YouTube, Search
+from pywhatkit import search
+from pyvolume import pyvolume
+
+from ctypes import cast, POINTER
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+
 import pyautogui as pg
+
+from words2numsrus import NumberExtractor
 import pyowm
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +23,7 @@ import main
 import speak
 import voice
 
+extractor = NumberExtractor()
 
 def news(text):
     for i in config.list_news:
@@ -71,9 +78,9 @@ def time_now(text):
             voice.va_speak(text)
             print(text)
 
-def game(text):
-    for text1 in speak.listen():
-        print(text1)
+# def game(text):
+#     for text1 in speak.listen():
+#         print(text1)
 
 def weather_with_city(text):
     words = text.split()
@@ -128,23 +135,70 @@ def internet(text):
             voice.va_speak("Включаю браузер")
             webbrowser.open_new_tab('https://www.google.com')
 
-def write(text):
-    for i in config.list_write:
+# def write(text):
+#     for i in config.list_write:
+#         if i in text:
+#             text
+
+def get_volume():
+    # Получение объекта интерфейса IAudioEndpointVolume
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
+
+    # Получение текущей громкости в процентах
+    volume_scalar = volume.GetMasterVolumeLevelScalar()
+    return int(volume_scalar * 100)
+
+
+def check_sound_commands(text):
+    for i in config.list_sound:
         if i in text:
-            text
+            if 'на максимум' in text and 'на всю' in text:
+                pyvolume(level=100)
 
+            if "громче" in text and "на" in text:
+                replayed = extractor.replace_groups(text)
+                words = replayed.split()
+                num = 0
+                for i in words:
+                    if i.isdigit():
+                        num = int(i)  # Преобразуем строку в целое число
+                        if num > 100:
+                            voice.va_speak("Вы сказали громкость больше 100")
+                        break
+                current_value = get_volume()
+                pyvolume(level=current_value+num)
 
-def play_track(text):
-    url = track_queue[0]
-    try:
-        video = YouTube(url)
-        audio_stream = video.streams.filter(only_audio=True, mime_type="audio/mp4").first()
-        if audio_stream:
-            voice_clients[guild_id].play(discord.FFmpegPCMAudio(source=audio_stream.url, executable=ffmpeg_path, **FFMPeG_CONf), after=lambda e: asyncio.run_coroutine_threadsafe(play_next_track(guild_id), client.loop))
-    except Exception as err:
-        print(f"Error playing audio: {err}")
-        await voice_clients[guild_id].disconnect()
-        del voice_clients[guild_id]
-        track_queue.pop(0)
-        if len(track_queue) > 0:
-            await play_track(guild_id)
+            elif "тише" in text and "на" in text:
+                replayed = extractor.replace_groups(text)
+                words = replayed.split()
+                num = 0
+                for i in words:
+                    if i.isdigit():
+                        num = int(i)
+                        if num > 100:
+                            voice.va_speak("Вы сказали громкость больше 100")
+                        break
+                current_value = get_volume()
+                pyvolume(level=current_value-num)
+            elif "на " in text:
+                replayed = extractor.replace_groups(text)
+                words = replayed.split()
+
+                num = 0
+                for i in words:
+                    if i.isdigit():
+                        num = int(i)  # Преобразуем строку в целое число
+                        if num > 100:
+                            voice.va_speak("Вы сказали громкость больше 100")
+                        break
+                pyvolume(level=num)
+            elif "громче" in text:
+                pyvolume(level=get_volume()+10)
+
+            elif "потише" in text:
+                pyvolume(level=get_volume()-10)
+
+            elif "выключи звук" in text:
+                pyvolume(level=0)
