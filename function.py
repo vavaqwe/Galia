@@ -85,18 +85,15 @@ def time_now(text):
 def weather_with_city(text):
     words = text.split()
     last_word = words[-1]
-    if last_word == "стоп" or last_word == "нужно":
-        return
     try:
-        if last_word:
-            observation = config.mgr.weather_at_place(last_word.strip())
-            w = observation.weather_with_сity
-            temp = w.temperature('celsius')["temp"]
-            voice.va_speak('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
-            print('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
+        observation = config.mgr.weather_at_place(last_word)
+        w = observation.weather_with_сity
+        temp = w.temperature('celsius')["temp"]
+        voice.va_speak('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
+        print('Температура ' + 'в' + last_word + '  ' + num2words(temp, lang='ru') + ' градусов')
     except pyowm.commons.exceptions.NotFoundError:
-        voice.va_speak("Извините я не поняла, скажите ещё раз город в котором вы хотите узнать погоду")
-        weather_with_city(speak.listen())
+        voice.va_speak("Извините я не поняла, впишите ещё раз город в котором вы хотите узнать погоду")
+        weather()
 
 def check_weather_commands(text):
     for command in config.list_weather:
@@ -157,7 +154,7 @@ def check_sound_commands(text):
             if 'на максимум' in text and 'на всю' in text:
                 pyvolume(level=100)
 
-            if "громче" in text and "на" in text:
+            elif "громче" in text and "на" in text:
                 replayed = extractor.replace_groups(text)
                 words = replayed.split()
                 num = 0

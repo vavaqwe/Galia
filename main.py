@@ -4,41 +4,58 @@ import threading
 import pystray
 import tkinter as tk
 
-from  speak import *
+import speak
 # from voice import va_speak
 from PIL import Image
 from function import *
 import config
 from tkinter import simpledialog
 
+# def listen():
+#     while True:
+#         data = stream.read(4096, exception_on_overflow=False)
+#         if (rec.AcceptWaveform(data)) and len(data) > 0:
+#             answer = json.loads(rec.Result())
+#             if answer['text']:
+#                 on_startup(answer['text'])
+
 def listen():
-    while True:
-        data = stream.read(4096, exception_on_overflow=False)
-        if (rec.AcceptWaveform(data)) and len(data) > 0:
-            answer = json.loads(rec.Result())
-            if answer['text']:
-                on_startup(answer['text'])
+    for text in speak.listen():
+        words = text.split()
+        first_word = words[0]
+        print(text)
+        for i in config.act:
+            if first_word == i:
+                new_string = ' '.join(words[1:])
+                print(new_string)
+                news(new_string)
+                off(new_string)
+                ua(new_string)
+                time_now(new_string)
+                check_weather_commands(new_string)
+                check_sound_commands(new_string)
+
 
 def start_listening():
     thread = threading.Thread(target=listen)
     thread.daemon = True
     thread.start()
 
-def on_startup(text: str):
-    print(text)
-    words = text.split()
-    first_word = words[0]
-    for i in config.act:
-        if first_word == i:
-            new_string = ' '.join(words[1:])
-            print(new_string)
-            news(new_string)
-            off(new_string)
-            ua(new_string)
-            time_now(new_string)
-            check_weather_commands(new_string)
-            check_sound_commands(new_string)
-            exit(new_string)
+# def on_startup(text: str):
+#     print(text)
+#     words = text.split()
+#     first_word = words[0]
+#     for i in config.act:
+#         if first_word == i:
+#             new_string = ' '.join(words[1:])
+#             print(new_string)
+#             news(new_string)
+#             off(new_string)
+#             ua(new_string)
+#             time_now(new_string)
+#             check_weather_commands(new_string)
+#             check_sound_commands(new_string)
+#             exit(new_string)
 
 def on_exit():
     print("Приложение завершено")
