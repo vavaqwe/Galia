@@ -1,9 +1,9 @@
 # C ТРЕЕМ
-# import sys
+import sys
 import threading
 import pystray
 import tkinter as tk
-
+import asyncio
 import speak
 # from voice import va_speak
 from PIL import Image
@@ -34,6 +34,7 @@ def listen():
                 time_now(new_string)
                 check_weather_commands(new_string)
                 check_sound_commands(new_string)
+                reminder(new_string)
 
 
 def start_listening():
