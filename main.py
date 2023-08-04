@@ -87,37 +87,45 @@ def listen():
 
     for text in speak.listen():
         print(text)
-
+        message = ''
         if not activate:
             for key, value in config.responses["act"]:
                 if key.lower() in text.lower():
                     activate = True
+                    words = text.split()
+                    if key in words:
+                        words.remove(key)
+                    message = ' '.join(words)
                     print("Активировано:", key)
                     break
 
         if activate:
-            if "выключись" in text.lower() or "отключись" in text.lower():
-                print("Отключение.")
-                activate = False
-                continue
+            if message:
+                if "выключись" in text.lower() or "отключись" in text.lower():
+                    print("Отключение.")
+                    activate = False
+                    continue
+                new_string = ''
+                for key, value in config.responses["act"]:
+                    if key.lower() in text.lower():
+                        words = text.split()
+                        if key in words:
+                            words.remove(key)
+                            new_string = ' '.join(words)
 
-            words = text.split()
-            new_string = ' '.join(words[1:])
+                news(new_string)
+                off(new_string)
+                ua(new_string)
+                time_now(new_string)
+                check_weather_commands(new_string)
+                check_sound_commands(new_string)
+                # reminder(new_string)
+                get_response(new_string)
+                activation = off(new_string)
 
-            news(new_string)
-            off(new_string)
-            ua(new_string)
-            time_now(new_string)
-            check_weather_commands(new_string)
-            check_sound_commands(new_string)
-            # reminder(new_string)
-            get_response(new_string)
-            activation = off(new_string)
+                if activation:
+                    activate = False
 
-            if activation:
-                activate = False
-
-    print("Завершение работы.")
 
 
 
