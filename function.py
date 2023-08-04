@@ -23,8 +23,9 @@ import voice
 extractor = NumberExtractor()
 
 def news(text):
-    for i in config.list_news:
-        if i == text:
+    for key, value in config.responses["requests"]:
+        if text in key.lower():
+            print(key,value,text)
             url = 'https://mignews.com/mobile'
             page = requests.get(url)
             filtered_news = []
@@ -48,12 +49,12 @@ def news(text):
                 voice.va_speak(rw)
 
 def off(text):
-    if ' выключи компьютер' in text:
+    if 'выключи компьютер' in text:
         voice.va_speak("Выключаю подождите")
         os.system("shutdown -s")
         quit()
 
-    if ' перезапусти компьютер' in text:
+    if 'перезапусти компьютер' in text:
         voice.va_speak("Перезапускаю подождите 10 секунд")
         os.system("shutdown /r /t 10")
         quit()
@@ -63,17 +64,41 @@ def ua(text):
         print("Героям Слава")
         voice.va_speak("Героям Слава")
 
+def get_response(text):
+    for key, value in config.responses["greeting"]:
+        if text in key.lower():
+            voice.va_speak(value)
+    return "Извините, я такого ещё не умею"
+
+
 def time_now(text):
-    for i in config.list_time:
-        if i in text:
+    for key, value in config.responses["requests"]:
+        if text in key.lower():
             now = datetime.datetime.now()
             text = "Сейч+ас " + num2words(now.hour, lang='ru') + " " + num2words(now.minute, lang='ru')
-            voice.va_speak(text)
+            voice.va_speak(value.replace("{TIME}",str(num2words(now.hour, lang='ru') + " " + num2words(now.minute, lang='ru'))))
             print(text)
+
+
+# def time_now(text):
+#     for i in config.list_time:
+#         if i in text:
+#             now = datetime.datetime.now()
+#             text = "Сейч+ас " + num2words(now.hour, lang='ru') + " " + num2words(now.minute, lang='ru')
+#             voice.va_speak(text)
+#             print(text)
+
 
 # def game(text):
 #     for text1 in speak.listen():
 #         print(text1)
+
+
+def off(text):
+    for key, value in config.responses["bye"]:
+        if text in key.lower():
+            voice.va_speak(value)
+            return False
 
 def weather_with_city(text):
     words = text.split()
@@ -89,8 +114,8 @@ def weather_with_city(text):
         weather()
 
 def check_weather_commands(text):
-    for command in config.list_weather:
-        if command in text:
+    for key, value in config.responses["requests"]:
+        if text in key.lower():
             if 'погода' in text and 'погоду' in text:
                 weather()
             if "в городе" in text:
@@ -142,8 +167,8 @@ def get_volume():
 
 
 def check_sound_commands(text):
-    for i in config.list_sound:
-        if i in text:
+    for query, response in config.responses["sound"]:
+        if text in query.lower():
             if 'на максимум' in text and 'на всю' in text:
                 pyvolume(level=100)
 
@@ -190,79 +215,78 @@ def check_sound_commands(text):
             elif 'потише' in text or 'тише' in text:
                 pyvolume(level=get_volume()-10)
 
-        elif 'выключи звук' in text:
-            pyvolume(level=0)
+            elif 'выключи звук' in text:
+                pyvolume(level=0)
 
 def find_numbers_in_string(text):
     return re.findall(r'\d+', text)
 
-# короче надо 1. json file 2. ко всем запросам сделать свои ответы
-def reminder(text):
-    for i in config.list_reminder:
-        if i in text:
-            if 'через' in text:
-                replayed = extractor.replace_groups(text)
-                words = replayed.split()
-                now = datetime.datetime.now()
-                print(words)
-                if 'час' in words:
-                    hour_ago = now + datetime.timedelta(hours=1)
-                    asyncio.run(rem(hour_ago))
-
-                elif 'полтора' in words and 'часа' in words:
-                    hour_ago = now + datetime.timedelta(minutes=90)
-                    asyncio.run(rem(hour_ago))
-
-                elif ('часа' in words and 'минут' in words ) or ( 'часов' in words and 'минут' in words ) \
-                        or ('час' in words and 'минут' in words ) :
-                    time = find_numbers_in_string(replayed)
-                    num1 = int(time[0])
-                    num2 = int(time[1]) if len(time) > 1 else 1
-                    hour_ago = now + datetime.timedelta(hours=num1,minutes=num2)
-                    asyncio.run(rem(hour_ago))
-
-                elif 'часа' in words or 'часов' in words :
-                    time = find_numbers_in_string(replayed)
-                    num1 = int(time[0])
-                    hour_ago = now + datetime.timedelta(hours=num1)
-                    asyncio.run(rem(hour_ago))
-
-                elif ('минут' in words and 'секунд' in words) or ('минуту' in words and 'секунд' in words):
-                    time = find_numbers_in_string(replayed)
-                    num1 = int(time[0])
-                    num2 = int(time[1]) if len(time) > 1 else 1
-                    print(num1,num2)
-                    minute_ago = now + datetime.timedelta(minutes=num1,seconds=num2)
-                    asyncio.run(rem(minute_ago))
-
-                elif 'минуту' in words:
-                    minute_ago = now + datetime.timedelta(minutes=1)
-                    asyncio.run(rem(minute_ago))
-
-                elif 'минут' in words:
-                    time = find_numbers_in_string(replayed)
-                    num = int(time[0])
-                    minute_ago = now + datetime.timedelta(minutes=num)
-                    asyncio.run(rem(minute_ago))
-
-                elif 'секунду' in words:
-                    second_ago = now + datetime.timedelta(seconds=1)
-                    asyncio.run(rem(second_ago))
-
-                elif 'секунд' in words or 'секунды 'in words:
-                    time = find_numbers_in_string(replayed)
-                    num = int(time[0])
-                    second_ago = now + datetime.timedelta(seconds=num)
-                    asyncio.run(rem(second_ago))
-
-
-            if 'в' in text:
-                print("kk")
-
-
-async def rem(time):
-    while True:
-        now = datetime.datetime.now()
-        if time == now:
-            voice.va_speak("сделать")
-            break
+# Короче надо 1. json file 2. ко всем запросам сделать свои ответы
+# def reminder(text):
+#     for key, value in config.responses:
+#         if text in key.lower():
+#             replayed = extractor.replace_groups(text)
+#             words = replayed.split()
+#             now = datetime.datetime.now()
+#             print(words)
+#             if 'час' in words:
+#                 hour_ago = now + datetime.timedelta(hours=1)
+#                 asyncio.run(rem(hour_ago))
+#
+#             elif 'полтора' in words and 'часа' in words:
+#                 hour_ago = now + datetime.timedelta(minutes=90)
+#                 asyncio.run(rem(hour_ago))
+#
+#             elif ('часа' in words and 'минут' in words ) or ( 'часов' in words and 'минут' in words ) \
+#                     or ('час' in words and 'минут' in words ) :
+#                 time = find_numbers_in_string(replayed)
+#                 num1 = int(time[0])
+#                 num2 = int(time[1]) if len(time) > 1 else 1
+#                 hour_ago = now + datetime.timedelta(hours=num1,minutes=num2)
+#                 asyncio.run(rem(hour_ago))
+#
+#             elif 'часа' in words or 'часов' in words :
+#                 time = find_numbers_in_string(replayed)
+#                 num1 = int(time[0])
+#                 hour_ago = now + datetime.timedelta(hours=num1)
+#                 asyncio.run(rem(hour_ago))
+#
+#             elif ('минут' in words and 'секунд' in words) or ('минуту' in words and 'секунд' in words):
+#                 time = find_numbers_in_string(replayed)
+#                 num1 = int(time[0])
+#                 num2 = int(time[1]) if len(time) > 1 else 1
+#                 print(num1,num2)
+#                 minute_ago = now + datetime.timedelta(minutes=num1,seconds=num2)
+#                 asyncio.run(rem(minute_ago))
+#
+#             elif 'минуту' in words:
+#                 minute_ago = now + datetime.timedelta(minutes=1)
+#                 asyncio.run(rem(minute_ago))
+#
+#             elif 'минут' in words:
+#                 time = find_numbers_in_string(replayed)
+#                 num = int(time[0])
+#                 minute_ago = now + datetime.timedelta(minutes=num)
+#                 asyncio.run(rem(minute_ago))
+#
+#             elif 'секунду' in words:
+#                 second_ago = now + datetime.timedelta(seconds=1)
+#                 asyncio.run(rem(second_ago))
+#
+#             elif 'секунд' in words or 'секунды 'in words:
+#                 time = find_numbers_in_string(replayed)
+#                 num = int(time[0])
+#                 second_ago = now + datetime.timedelta(seconds=num)
+#                 asyncio.run(rem(second_ago))
+#
+#
+#             if 'в' in text:
+#                 print("kk")
+#
+#
+# async def rem(time):
+#     while True:
+#         now = datetime.datetime.now()
+#         if time == now:
+#             voice.va_speak("сделать")
+#             break

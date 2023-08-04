@@ -1,15 +1,17 @@
 # C ТРЕЕМ
 import sys
 import threading
-import pystray
 import tkinter as tk
-import asyncio
-import speak
+from tkinter import simpledialog
+
+import pystray
 # from voice import va_speak
 from PIL import Image
-from function import *
+
 import config
-from tkinter import simpledialog
+import speak
+from function import *
+
 
 # def listen():
 #     while True:
@@ -19,23 +21,146 @@ from tkinter import simpledialog
 #             if answer['text']:
 #                 on_startup(answer['text'])
 
+# def listen():
+#     activation = False
+#     for text in speak.listen():
+#         print(text)
+#         words = ()
+#         if not activation:
+#             for key, value in config.responses["act"]:
+#                 if key.lower() in text.lower():
+#                     activation = True
+#                     words = text.split()
+#                     break
+#
+#         if activation:
+#             new_string = ' '.join(words[1:])
+#             print(new_string)
+#             news(new_string)
+#             off(new_string)
+#             ua(new_string)
+#             time_now(new_string)
+#             check_weather_commands(new_string)
+#             check_sound_commands(new_string)
+#             # reminder(new_string)
+#             get_response(new_string)
+#             activation = off(new_string)
+# def listen():
+#     activate = False
+#     for text in speak.listen():
+#
+#         if not activate:
+#             for key, value in config.responses["act"]:
+#                 if key in text.lower():
+#                     activate = True
+#                     words = text.split()
+#                     words.remove(key)
+#                     new_string = ' '.join(words[1:])
+#                     get_response(new_string)
+#                     news(new_string)
+#                     off(new_string)
+#                     ua(new_string)
+#                     time_now(new_string)
+#                     check_weather_commands(new_string)
+#                     check_sound_commands(new_string)
+#                     # reminder(new_string)
+#                     activation = off(new_string)
+#                     if activation:
+#                         activate = False
+#
+#         if activate:
+#             for key, value in config.responses["act"]:
+#                 words = text.split()
+#                 words.remove(key)
+#                 new_string = ' '.join(words[1:])
+#                 news(new_string)
+#                 off(new_string)
+#                 ua(new_string)
+#                 time_now(new_string)
+#                 check_weather_commands(new_string)
+#                 check_sound_commands(new_string)
+#                 # reminder(new_string)
+#                 get_response(new_string)
+#                 activation = off(new_string)
 def listen():
-    for text in speak.listen():
-        words = text.split()
-        first_word = words[0]
-        print(text)
-        for i in config.act:
-            if first_word == i:
-                new_string = ' '.join(words[1:])
-                print(new_string)
-                news(new_string)
-                off(new_string)
-                ua(new_string)
-                time_now(new_string)
-                check_weather_commands(new_string)
-                check_sound_commands(new_string)
-                reminder(new_string)
+    activate = False
 
+    for text in speak.listen():
+        print(text)
+
+        if not activate:
+            for key, value in config.responses["act"]:
+                if key.lower() in text.lower():
+                    activate = True
+                    print("Активировано:", key)
+                    break
+
+        if activate:
+            if "выключись" in text.lower() or "отключись" in text.lower():
+                print("Отключение.")
+                activate = False
+                continue
+
+            words = text.split()
+            new_string = ' '.join(words[1:])
+
+            news(new_string)
+            off(new_string)
+            ua(new_string)
+            time_now(new_string)
+            check_weather_commands(new_string)
+            check_sound_commands(new_string)
+            # reminder(new_string)
+            get_response(new_string)
+            activation = off(new_string)
+
+            if activation:
+                activate = False
+
+    print("Завершение работы.")
+
+
+
+
+
+# def start(text,act):
+#     # words = text.split()
+#     # words.remove(key)
+#     # new_string = ' '.join(words[1:])
+#     words = text.split()
+#     new_string = ' '.join(words[1:])
+#     news(new_string)
+#     off(new_string)
+#     ua(new_string)
+#     time_now(new_string)
+#     check_weather_commands(new_string)
+#     check_sound_commands(new_string)
+#     # reminder(new_string)
+#     get_response(new_string)
+#     activation = off(new_string)
+#     if activation:
+#         return
+
+# def listen():
+#     for text in speak.listen():
+#         for key , value in config.responses["act"]:
+#             if key.lower() in text :
+#                 print(key,value)
+#                 words = text.split()
+#                 words.remove(key)
+#                 new_string = ' '.join(words[1:])
+#                 print(new_string)
+#                 news(new_string)
+#                 off(new_string)
+#                 ua(new_string)
+#                 time_now(new_string)
+#                 check_weather_commands(new_string)
+#                 check_sound_commands(new_string)
+#                 # reminder(new_string)
+#                 get_response(new_string)
+#                 activation = off(new_string)
+#                 if activation:
+#                     break
 
 def start_listening():
     thread = threading.Thread(target=listen)
